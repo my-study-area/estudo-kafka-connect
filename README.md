@@ -2,6 +2,40 @@
 
 Projetos de estudo de kafka-connect
 ## Iniciando
+
+### Introduction to Kafka Connectors
+```bash
+# entra no diretório
+cd baeldung
+
+# inicia os containers
+docker-compose up -d
+
+# acessa container do kafka-connect
+docker-compose run --rm kafka-connect bash
+
+# adiciona arquivo para o source connector
+echo -e "foo\nbar\n" > ./test.txt
+
+# inicia worker
+connect-standalone \
+  ./connect-standalone.properties \
+  ./connect-file-source.properties \
+  ./connect-file-sink.properties
+
+# inicia outro terminal do bash do kafka-connect
+docker-compose run --rm kafka-connect bash
+
+# consome as mensagens lançadas pelo worker
+kafka-console-consumer --bootstrap-server kafka:9092 \
+--topic connect-test --from-beginning
+
+# resposta esperada
+# {"schema":{"type":"string","optional":false},"payload":"foo"}
+# {"schema":{"type":"string","optional":false},"payload":"bar"}
+
+fonte: [Introduction to Kafka Connectors](https://www.baeldung.com/kafka-connectors-guide)
+
 ### Projeto Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)
 ```bash
 # entra no diretório
