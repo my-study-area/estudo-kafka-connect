@@ -41,6 +41,11 @@ connect-distributed connect-distributed.properties
 curl -d @connect-file-source.json \
   -H "Content-Type: application/json" \
   -X POST http://localhost:8083/connectors -v
+
+# adiciona um connector sink via api
+curl -d @connect-file-sink.json \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:8083/connectors
 ```
 
 connect-file-source.json:
@@ -52,6 +57,19 @@ connect-file-source.json:
         "tasks.max": 1,
         "file": "test-distributed.txt",
         "topic": "connect-distributed"
+    }
+}
+```
+
+connect-file-sink.json:
+```json
+{
+    "name": "local-file-sink",
+    "config": {
+        "connector.class": "FileStreamSink",
+        "tasks.max": 1,
+        "file": "test-distributed.sink.txt",
+        "topics": "connect-distributed"
     }
 }
 ```
