@@ -34,6 +34,28 @@ kafka-console-consumer --bootstrap-server kafka:9092 \
 # {"schema":{"type":"string","optional":false},"payload":"foo"}
 # {"schema":{"type":"string","optional":false},"payload":"bar"}
 
+# inicia o kafka-connect no modo distribuído
+connect-distributed connect-distributed.properties
+
+# 
+curl -d @connect-file-source.json \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:8083/connectors -v
+```
+
+connect-file-source.json:
+```json
+{
+    "name": "local-file-source",
+    "config": {
+        "connector.class": "FileStreamSource",
+        "tasks.max": 1,
+        "file": "test-distributed.txt",
+        "topic": "connect-distributed"
+    }
+}
+```
+
 fonte: [Introduction to Kafka Connectors](https://www.baeldung.com/kafka-connectors-guide)
 
 ### Projeto Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)
