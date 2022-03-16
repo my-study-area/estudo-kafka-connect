@@ -37,7 +37,7 @@ kafka-console-consumer --bootstrap-server kafka:9092 \
 # inicia o kafka-connect no modo distribuído
 connect-distributed connect-distributed.properties
 
-# 
+# adiciona um connector source
 curl -d @connect-file-source.json \
   -H "Content-Type: application/json" \
   -X POST http://localhost:8083/connectors -v
@@ -46,6 +46,14 @@ curl -d @connect-file-source.json \
 curl -d @connect-file-sink.json \
   -H "Content-Type: application/json" \
   -X POST http://localhost:8083/connectors
+
+# consome as mensagens do tópico connect-distributed
+kafka-console-consumer --bootstrap-server kafka:9092 \
+--topic connect-distributed --from-beginning
+
+# deleta os connectors via api
+curl -X DELETE http://localhost:8083/connectors/local-file-source
+curl -X DELETE http://localhost:8083/connectors/local-file-sink
 ```
 
 connect-file-source.json:
