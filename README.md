@@ -116,3 +116,8 @@ Para utilizar o Kibana acesse [http://localhost:5601/](http://localhost:5601/)
 - acesse [http://localhost:5601/app/discover#/](http://localhost:5601/app/discover#/) para visualizar os dados. Obs: no menu lateral esquerdo, em `Available fields`, selecione os campos: **payload.before.id** e	**payload.before.nome** para melhorar a visualização dos dados.
 
 fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https://www.youtube.com/watch?v=qO4JL38_F1s&ab_channel=FullCycle)
+
+## Links
+- [Conceitos de kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html)
+- [Iniciando com Kafka Connect](https://docs.confluent.io/home/connect/self-managed/userguide.html)
+- [Curso de Kafka Connect](https://developer.confluent.io/learn-kafka/kafka-connect/intro/)
