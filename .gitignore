@@ -1,2 +1,5 @@
 baeldung/data/test.txt
 baeldung/data/test.sink.txt
+baeldung/data/.bash_history
+baeldung/data/test-distributed.sink.txt
+baeldung/data/.fuse*
