@@ -54,6 +54,18 @@ kafka-console-consumer --bootstrap-server kafka:9092 \
 # deleta os connectors via api
 curl -X DELETE http://localhost:8083/connectors/local-file-source
 curl -X DELETE http://localhost:8083/connectors/local-file-sink
+
+# inicia kafka connect com configuração para transformar dados
+connect-distributed connect-distributed-transformer.properties
+
+# adiciona um connector source com transformação de dados
+curl -v -d @data/connect-file-source-transform.json \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:8083/connectors
+
+# cria consumidor para o tópico connect-transformation
+kafka-console-consumer --bootstrap-server kafka:9092 \
+--topic connect-transformation --from-beginning
 ```
 
 connect-file-source.json:
@@ -121,3 +133,4 @@ fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https
 - [Conceitos de kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html)
 - [Iniciando com Kafka Connect](https://docs.confluent.io/home/connect/self-managed/userguide.html)
 - [Curso de Kafka Connect](https://developer.confluent.io/learn-kafka/kafka-connect/intro/)
+- [Apache Kafka Connect](https://kafka.apache.org/documentation/#connect)
