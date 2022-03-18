@@ -66,6 +66,11 @@ curl -v -d @data/connect-file-source-transform.json \
 # cria consumidor para o tópico connect-transformation
 kafka-console-consumer --bootstrap-server kafka:9092 \
 --topic connect-transformation --from-beginning
+
+#  acessa container do kafka-connect
+# instala conector do confluent-hub 
+docker-compose run --rm kafka-connect bash
+confluent-hub install confluentinc/kafka-connect-mqtt:1.0.0-preview
 ```
 
 connect-file-source.json:
@@ -134,3 +139,5 @@ fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https
 - [Iniciando com Kafka Connect](https://docs.confluent.io/home/connect/self-managed/userguide.html)
 - [Curso de Kafka Connect](https://developer.confluent.io/learn-kafka/kafka-connect/intro/)
 - [Apache Kafka Connect](https://kafka.apache.org/documentation/#connect)
+- [Kafka Connect Transformations](https://docs.confluent.io/platform/current/connect/transforms/overview.html)
+- [Confluent Hub](https://www.confluent.io/hub/)
