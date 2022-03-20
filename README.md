@@ -141,3 +141,5 @@ fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https
 - [Apache Kafka Connect](https://kafka.apache.org/documentation/#connect)
 - [Kafka Connect Transformations](https://docs.confluent.io/platform/current/connect/transforms/overview.html)
 - [Confluent Hub](https://www.confluent.io/hub/)
+- [Kafka Connect with FileStreamSource](https://docs.confluent.io/platform/7.0.1/connect/quickstart.html)
+- [Kafka Connect Converter](https://rmoff.net/2019/05/08/when-a-kafka-connect-converter-is-not-a-_converter_/)

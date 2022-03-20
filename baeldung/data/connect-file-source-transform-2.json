@@ -1,0 +1,17 @@
+{
+  "name": "transformation",
+  "config": {
+      "connector.class": "FileStreamSource",
+      "tasks.max": 1,
+      "file": "test-transformation.txt",
+      "topic": "transformation",
+      "key.converter.schemas.enable":false,
+      "value.converter.schemas.enable":false,
+      "transforms": "MakeMap,InsertSource",
+      "transforms.MakeMap.type": "org.apache.kafka.connect.transforms.HoistField$Value",
+      "transforms.MakeMap.field": "line",
+      "transforms.InsertSource.type": "org.apache.kafka.connect.transforms.InsertField$Value",
+      "transforms.InsertSource.timestamp.field": "tempo"
+
+  }
+}
