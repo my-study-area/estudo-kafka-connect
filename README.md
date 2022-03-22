@@ -143,3 +143,5 @@ fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https
 - [Confluent Hub](https://www.confluent.io/hub/)
 - [Kafka Connect with FileStreamSource](https://docs.confluent.io/platform/7.0.1/connect/quickstart.html)
 - [Kafka Connect Converter](https://rmoff.net/2019/05/08/when-a-kafka-connect-converter-is-not-a-_converter_/)
+- [Dados Mockados com Kafka Connect Datagen](https://developer.confluent.io/tutorials/kafka-connect-datagen/kafka.html)
+- [Running Confluent Kafka Connect Datagen Plugin Quickstart Template Locally with Docker](https://thecodinginterface.com/blog/kafka-connect-datagen-plugin/)
