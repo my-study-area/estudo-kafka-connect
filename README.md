@@ -123,6 +123,17 @@ create table products(id int, name varchar(255));
 
 # insere registro na tabela products
 insert into products values(1, "carro");
+
+# seleciona os registros da tabela products com 
+# visualização por linha
+select * from products order by id desc limit 10\G;
+*************************** 1. row ***************************
+  id: 2
+name: bicicleta
+*************************** 2. row ***************************
+  id: 1
+name: carro
+2 rows in set (0.00 sec)
 ```
 
 Para utilizar o control-center no navegador acesse [http://localhost:9021/](http://localhost:9021/)
