@@ -3,6 +3,53 @@
 Projetos de estudo de kafka-connect
 ## Iniciando
 
+### Curso: Kafka Connect 101 (Confluent)
+```bash
+# inicia container
+docker-compose up -d
+
+# cria connector datagen
+curl -i -X PUT http://localhost:8083/connectors/datagen_local_01/config \
+     -H "Content-Type: application/json" \
+     -d '{
+            "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+            "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+            "kafka.topic": "pageviews",
+            "quickstart": "pageviews",
+            "max.interval": 1000,
+            "iterations": 10000000,
+            "tasks.max": "1"
+        }'
+
+# verifica se o conector está executando
+curl -s http://localhost:8083/connectors/datagen_local_01/status
+
+# lê as mensagens do tópico pageviews
+docker-compose exec connect kafka-avro-console-consumer \
+ --bootstrap-server broker:9092 \
+ --property schema.registry.url=http://schema-registry:8081 \
+ --topic pageviews \
+ --property print.key=true \
+ --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
+ --property key.separator=" : " \
+ --max-messages 10
+
+ # verifica o stack trace utilizando curl e jq
+ curl -s "http://localhost:8083/connectors/source-debezium-orders-00/status"
+| jq '.tasks[0].trace'
+
+# logs do serviço connect via docker-compose
+docker-compose logs -f connect
+
+# exemplo de alteração do level de log sem reiniciar conector
+curl -s -X PUT -H "Content-Type:application/json" \
+    http://localhost:8083/admin/loggers/io.debezium \
+    -d '{"level": "TRACE"}'
+```
+
+
+Fonte: [Kafka Connect 101](https://developer.confluent.io/learn-kafka/kafka-connect/intro/)
+
 ### Introduction to Kafka Connectors
 ```bash
 # entra no diretório
@@ -145,6 +192,10 @@ Para utilizar o Kibana acesse [http://localhost:5601/](http://localhost:5601/)
 
 fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https://www.youtube.com/watch?v=qO4JL38_F1s&ab_channel=FullCycle)
 
+## Api
+
+curl -v http://localhost:8083/connector-plugins
+
 ## Links
 - [Conceitos de kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html)
 - [Iniciando com Kafka Connect](https://docs.confluent.io/home/connect/self-managed/userguide.html)
@@ -156,3 +207,5 @@ fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https
 - [Kafka Connect Converter](https://rmoff.net/2019/05/08/when-a-kafka-connect-converter-is-not-a-_converter_/)
 - [Dados Mockados com Kafka Connect Datagen](https://developer.confluent.io/tutorials/kafka-connect-datagen/kafka.html)
 - [Running Confluent Kafka Connect Datagen Plugin Quickstart Template Locally with Docker](https://thecodinginterface.com/blog/kafka-connect-datagen-plugin/)
+- [Quickstart parameters in kafka-connect-datagen](https://github.com/confluentinc/kafka-connect-datagen/blob/master/README.md#kafka-connect-datagen-specific-parameters)
+- [Demo examples of Kafka Connect](https://github.com/confluentinc/demo-scene/#kafka-connect)
