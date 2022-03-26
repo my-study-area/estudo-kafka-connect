@@ -45,6 +45,50 @@ docker-compose logs -f connect
 curl -s -X PUT -H "Content-Type:application/json" \
     http://localhost:8083/admin/loggers/io.debezium \
     -d '{"level": "TRACE"}'
+
+# verifica o status de um conector e filtra a saída
+# exibindo o nome e o status usando jq
+curl -v http://localhost:8083/connectors/transform2/status | \
+jq -c '[.name, .tasks[].state]'
+
+# exemplo de conector com dead letter queue
+# gravando o motivo do erro, no header da mensagem
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
+        "name": "file_sink_03",
+        "config": {
+                "connector.class": "org.apache.kafka.connect.file.FileStreamSinkConnector",
+                "topics":"test_topic_json",
+                "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+                "value.converter.schemas.enable": false,
+                "key.converter":"org.apache.kafka.connect.json.JsonConverter",
+                "key.converter.schemas.enable": false,
+                "file": "/data/file_sink_03.txt",
+                "errors.tolerance": "all",
+                "errors.deadletterqueue.topic.name":"dlq_file_sink_03",
+                "errors.deadletterqueue.topic.replication.factor": 1,
+                "errors.deadletterqueue.context.headers.enable":true
+                }
+        }'
+
+# exemplo de conector, exibindo o motivo do erro no log do worker
+# "errors.log.enable":true -> habilita o log
+# "errors.log.include.messages":true -> habilita metadata no log
+#
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
+        "name": "file_sink_04",
+        "config": {
+                "connector.class": "org.apache.kafka.connect.file.FileStreamSinkConnector",
+                "topics":"test_topic_json",
+                "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+                "value.converter.schemas.enable": false,
+                "key.converter":"org.apache.kafka.connect.json.JsonConverter",
+                "key.converter.schemas.enable": false,
+                "file": "/data/file_sink_04.txt",
+                "errors.tolerance": "all",
+                "errors.log.enable":true,
+                "errors.log.include.messages":true
+                }
+        }'
 ```
 
 
@@ -209,3 +253,6 @@ curl -v http://localhost:8083/connector-plugins
 - [Running Confluent Kafka Connect Datagen Plugin Quickstart Template Locally with Docker](https://thecodinginterface.com/blog/kafka-connect-datagen-plugin/)
 - [Quickstart parameters in kafka-connect-datagen](https://github.com/confluentinc/kafka-connect-datagen/blob/master/README.md#kafka-connect-datagen-specific-parameters)
 - [Demo examples of Kafka Connect](https://github.com/confluentinc/demo-scene/#kafka-connect)
+- [kcat (formerly kafkacat) Utility](https://docs.confluent.io/platform/current/app-development/kafkacat-usage.html#metadata-listing-mode)
+- [Conceitos de Dead Letter Queue no Kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html#dead-letter-queues)
+- [Kafka Connect Deep Dive – Error Handling and Dead Letter Queues](https://www.confluent.io/blog/kafka-connect-deep-dive-error-handling-dead-letter-queues/?_ga=2.82422291.464758877.1647995300-1077278967.1647804227)
