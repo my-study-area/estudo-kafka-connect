@@ -89,6 +89,18 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 "errors.log.include.messages":true
                 }
         }'
+
+# verifica a versão e id do cluster
+curl -v http://localhost:8083
+
+# lista os plugins de conectores instalados
+curl -v http://localhost:8083/connector-plugins
+
+# lista os conectores
+curl -v http://localhost:8083/connectors/
+
+# lista as configurações do conector
+curl -v http://localhost:8083/connectors/file_sink_04/config 
 ```
 
 
@@ -256,3 +268,4 @@ curl -v http://localhost:8083/connector-plugins
 - [kcat (formerly kafkacat) Utility](https://docs.confluent.io/platform/current/app-development/kafkacat-usage.html#metadata-listing-mode)
 - [Conceitos de Dead Letter Queue no Kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html#dead-letter-queues)
 - [Kafka Connect Deep Dive – Error Handling and Dead Letter Queues](https://www.confluent.io/blog/kafka-connect-deep-dive-error-handling-dead-letter-queues/?_ga=2.82422291.464758877.1647995300-1077278967.1647804227)
+- [Connect REST Interface](https://docs.confluent.io/platform/current/connect/references/restapi.html)
