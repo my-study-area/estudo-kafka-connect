@@ -269,3 +269,5 @@ curl -v http://localhost:8083/connector-plugins
 - [Conceitos de Dead Letter Queue no Kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html#dead-letter-queues)
 - [Kafka Connect Deep Dive – Error Handling and Dead Letter Queues](https://www.confluent.io/blog/kafka-connect-deep-dive-error-handling-dead-letter-queues/?_ga=2.82422291.464758877.1647995300-1077278967.1647804227)
 - [Connect REST Interface](https://docs.confluent.io/platform/current/connect/references/restapi.html)
+- [Changing the Logging Level for Kafka Connect Dynamically](https://rmoff.net/2020/01/16/changing-the-logging-level-for-kafka-connect-dynamically/)
+- [Monitoring Kafka Connect and Connectors](https://docs.confluent.io/platform/current/connect/monitoring.html)
