@@ -13,6 +13,93 @@
 Projetos de estudo de kafka-connect
 ## Iniciando
 
+### Twelve Days of SMT 
+```bash
+# inicia os containers
+dockercompose up -d
+
+# cria um conector para gerar dados automáticos no mysql
+curl -i -X PUT -H  "Content-Type:application/json" \
+    http://localhost:8083/connectors/source-voluble-datagen-00/config \
+    -d '{
+        "connector.class"                      : "io.mdrogalis.voluble.VolubleSourceConnector",
+        "genkp.customers.with"                 : "#{Internet.uuid}",
+        "genv.customers.name.with"             : "#{HitchhikersGuideToTheGalaxy.character}",
+        "genv.customers.email.with"            : "#{Internet.emailAddress}",
+        "genv.customers.location->city.with"   : "#{HitchhikersGuideToTheGalaxy.location}",
+        "genv.customers.location->planet.with" : "#{HitchhikersGuideToTheGalaxy.planet}",
+        "topic.customers.records.exactly"      : 10,
+
+        "genkp.transactions.with"                : "#{Internet.uuid}",
+        "genv.transactions.customer_id.matching" : "customers.key",
+        "genv.transactions.cost.with"            : "#{Commerce.price}",
+        "genv.transactions.card_type.with"       : "#{Business.creditCardType}",
+        "genv.transactions.item.with"            : "#{Beer.name}",
+        "topic.transactions.throttle.ms"         : 500
+    }'
+
+# cria conector para dbc para alimentar o mysql
+curl -i -X PUT -H "Accept:application/json" \
+    -H  "Content-Type:application/json" http://localhost:8083/connectors/sink-jdbc-mysql-00/config \
+    -d '{
+          "connector.class"     : "io.confluent.connect.jdbc.JdbcSinkConnector",
+          "connection.url"      : "jdbc:mysql://mysql:3306/demo",
+          "connection.user"     : "mysqluser",
+          "connection.password" : "mysqlpw",
+          "topics"              : "transactions",
+          "tasks.max"           : "4",
+          "auto.create"         : "true"
+        }'
+
+# acessa o container mysql com o usuário root
+# descreve a estrutura da tabela
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD demo'
+desc transactions;
+
+// resposta
++-------------+------+------+-----+---------+-------+
+| Field       | Type | Null | Key | Default | Extra |
++-------------+------+------+-----+---------+-------+
+| customer_id | text | YES  |     | NULL    |       |
+| cost        | text | YES  |     | NULL    |       |
+| item        | text | YES  |     | NULL    |       |
+| card_type   | text | YES  |     | NULL    |       |
++-------------+------+------+-----+---------+-------+
+
+# atualiza conector adicionando coluna messageTS
+curl -i -X PUT -H "Accept:application/json" \
+    -H  "Content-Type:application/json" http://localhost:8083/connectors/sink-jdbc-mysql-00/config \
+    -d '{
+          "connector.class"     : "io.confluent.connect.jdbc.JdbcSinkConnector",
+          "connection.url"      : "jdbc:mysql://mysql:3306/demo",
+          "connection.user"     : "mysqluser",
+          "connection.password" : "mysqlpw",
+          "topics"              : "transactions",
+          "tasks.max"           : "4",
+          "auto.create"         : "true",
+          "auto.evolve"         : "true",
+          "transforms"                         : "insertTS",
+          "transforms.insertTS.type"           : "org.apache.kafka.connect.transforms.InsertField$Value",
+          "transforms.insertTS.timestamp.field": "messageTS"
+        }'
+
+# acessa o container mysql com o usuário root
+# descreve a estrutura da tabela
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD demo'
+desc transactions;
+
+//resposta
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| customer_id | text        | YES  |     | NULL    |       |
+| cost        | text        | YES  |     | NULL    |       |
+| item        | text        | YES  |     | NULL    |       |
+| card_type   | text        | YES  |     | NULL    |       |
+| messageTS   | datetime(3) | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+```
+Para acessar as mensagens criadas pelo conector `source-voluble-datagen-00` (io.mdrogalis.voluble.VolubleSourceConnector), acesse [http://localhost:9021/](http://localhost:9021/) > Menu lateral `Topics` > click no tópico `transactions` e click em `Messages`
 ### Curso: Kafka Connect 101 (Confluent)
 ```bash
 # inicia container
