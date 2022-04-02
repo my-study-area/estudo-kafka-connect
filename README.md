@@ -98,6 +98,39 @@ desc transactions;
 | card_type   | text        | YES  |     | NULL    |       |
 | messageTS   | datetime(3) | YES  |     | NULL    |       |
 +-------------+-------------+------+-----+---------+-------+
+
+# cria o bucket 
+aws --endpoint-url=http://localhost:4566 s3 mb s3://rmoff-smt-demo-01
+
+# lista os buckets criados
+aws s3api list-buckets --query "Buckets[].Name" \
+--endpoint-url=http://localhost:4566
+
+# cria conector com s3
+curl -i -X PUT -H "Accept:application/json" \
+    -H  "Content-Type:application/json" http://localhost:8083/connectors/sink-s3-00/config \
+    -d '{
+          "connector.class"        : "io.confluent.connect.s3.S3SinkConnector",
+          "storage.class"          : "io.confluent.connect.s3.storage.S3Storage",
+          "store.url" : "http://localstack:4566",
+          "s3.region"              : "us-west-2",
+          "s3.bucket.name"         : "rmoff-smt-demo-01",
+          "topics"                 : "customers,transactions",
+          "tasks.max"              : "4",
+          "flush.size"             : "16",
+          "format.class"           : "io.confluent.connect.s3.format.json.JsonFormat",
+          "schema.generator.class" : "io.confluent.connect.storage.hive.schema.DefaultSchemaGenerator",
+          "schema.compatibility"   : "NONE",
+          "partitioner.class"      : "io.confluent.connect.storage.partitioner.DefaultPartitioner"
+        }'
+
+# lista todos os arquivo no s3
+aws --endpoint-url=http://localhost:4566 s3 ls s3://rmoff-smt-demo-01 \
+--recursive --human-readable --summarize
+
+# lista todos os arquivos num bucket s3
+aws --endpoint-url=http://localhost:4566 s3api list-objects --bucket rmoff-smt-demo-01 \
+--output text --query "Contents[].{Key: Key}"
 ```
 Para acessar as mensagens criadas pelo conector `source-voluble-datagen-00` (io.mdrogalis.voluble.VolubleSourceConnector), acesse [http://localhost:9021/](http://localhost:9021/) > Menu lateral `Topics` > click no tópico `transactions` e click em `Messages`
 ### Curso: Kafka Connect 101 (Confluent)
@@ -368,3 +401,5 @@ curl -v http://localhost:8083/connector-plugins
 - [Connect REST Interface](https://docs.confluent.io/platform/current/connect/references/restapi.html)
 - [Changing the Logging Level for Kafka Connect Dynamically](https://rmoff.net/2020/01/16/changing-the-logging-level-for-kafka-connect-dynamically/)
 - [Monitoring Kafka Connect and Connectors](https://docs.confluent.io/platform/current/connect/monitoring.html)
+- [Amazon S3 Sink Connector Configuration Properties](https://docs.confluent.io/kafka-connect-s3-sink/current/configuration_options.html#storage)
+- [List all Files in an S3 Bucket with AWS CLI](https://bobbyhadz.com/blog/aws-cli-list-all-files-in-bucket)
