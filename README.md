@@ -38,7 +38,18 @@ curl -i -X PUT -H  "Content-Type:application/json" \
         "topic.transactions.throttle.ms"         : 500
     }'
 
-# cria conector para dbc para alimentar o mysql
+# lista os tópicos
+docker-compose exec kafkacat sh -c "kafkacat -b broker:29092 -L | grep topic"
+
+# consume as mensagens do tópico transactions criado no conector source-voluble-datagen-00
+# obs: os valores do payload estarão serializados
+docker-compose exec kafkacat sh -c "kafkacat -b broker:29092 -t transactions -C -J | jq"
+
+# consome as mensagem deserializando usando schema-registry e avro
+docker-compose exec kafkacat sh -c "kafkacat -b broker:29092 -t transactions \
+-s value=avro -r http://schema-registry:8081 -C -J | jq"
+
+# cria conector jdbc para alimentar o mysql
 curl -i -X PUT -H "Accept:application/json" \
     -H  "Content-Type:application/json" http://localhost:8083/connectors/sink-jdbc-mysql-00/config \
     -d '{
