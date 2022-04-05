@@ -14,11 +14,91 @@ Projetos de estudo de kafka-connect
 ## Iniciando
 
 ### Twelve Days of SMT 
+#### Twelve Days of SMT 🎄 - Day 10: ReplaceField
+```bash
+# cria um conector para criar dados automáticos no tópico source-voluble-datagen-day10-00
+curl -i -X PUT -H  "Content-Type:application/json" \
+    http://localhost:8083/connectors/source-voluble-datagen-day10-00/config \
+    -d '{
+        "connector.class"                              : "io.mdrogalis.voluble.VolubleSourceConnector",
+        "genkp.day10-transactions.with"                : "#{Internet.uuid}",
+        "genv.day10-transactions.cost.with"            : "#{Commerce.price}",
+        "genv.day10-transactions.units.with"           : "#{number.number_between '\''1'\'','\''99'\''}",
+        "genv.day10-transactions.txn_date.with"        : "#{date.past '\''10'\'','\''DAYS'\''}",
+        "genv.day10-transactions.cc_num.with"          : "#{Business.creditCardNumber}",
+        "genv.day10-transactions.cc_exp.with"          : "#{Business.creditCardExpiry}",
+        "genv.day10-transactions.card_type.with"       : "#{Business.creditCardType}",
+        "genv.day10-transactions.customer_remarks.with": "#{BackToTheFuture.quote}",
+        "genv.day10-transactions.item.with"            : "#{Beer.name}",
+        "topic.day10-transactions.throttle.ms"         : 1000
+    }'
+
+# consome as mensagem deserializando usando schema-registry e avro
+docker-compose exec kafkacat sh -c "kafkacat -b broker:29092 -t day10-transactions \
+-s value=avro -r http://schema-registry:8081 -C -J -e | jq [.payload]"
+
+# cria conector para salvar dados no mysql usando blacklist
+curl -i -X PUT -H "Accept:application/json" \
+  -H  "Content-Type:application/json" http://localhost:8083/connectors/sink-jdbc-mysql-day10-01/config \
+  -d '{
+      "connector.class"            : "io.confluent.connect.jdbc.JdbcSinkConnector",
+      "connection.url"             : "jdbc:mysql://mysql:3306/demo",
+      "connection.user"            : "mysqluser",
+      "connection.password"        : "mysqlpw",
+      "topics"                     : "day10-transactions",
+      "tasks.max"                  : "4",
+      "auto.create"                : "true",
+      "auto.evolve"                : "true",
+      "transforms"                 : "dropCC",
+      "transforms.dropCC.type"     : "org.apache.kafka.connect.transforms.ReplaceField$Value",
+      "transforms.dropCC.blacklist": "cc_num,cc_exp,card_type"
+      }'
+
+# conecta no mysql e mostra a estrutura da tabela sem os campos do blacklist
+docker exec -it mysql bash -c 'mysql -u root -p$MYSQL_ROOT_PASSWORD demo'
+desc `day10-transactions`;
+
+# cria conector para salvar dados no mysql usando whitelist
+curl -X PUT http://localhost:8083/connectors/source-jdbc-mysql-day10-00/config \
+  -H "Content-Type: application/json" -d '{
+    "connector.class"                  : "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "connection.url"                   : "jdbc:mysql://mysql:3306/demo",
+    "connection.user"                  : "mysqluser",
+    "connection.password"              : "mysqlpw",
+    "topic.prefix"                     : "day10-",
+    "poll.interval.ms"                 : 10000,
+    "tasks.max"                        : 1,
+    "table.whitelist"                  : "production_data",
+    "mode"                             : "bulk",
+    "transforms"                       : "selectFields",
+    "transforms.selectFields.type"     : "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.selectFields.whitelist": "item,cost,units,txn_date"
+  }'
+
+# cria conector para salvar dados no mysql renomeando campos
+curl -i -X PUT -H "Accept:application/json" \
+  -H  "Content-Type:application/json" http://localhost:8083/connectors/sink-jdbc-mysql-day10-02/config \
+  -d '{
+      "connector.class"            : "io.confluent.connect.jdbc.JdbcSinkConnector",
+      "connection.url"             : "jdbc:mysql://mysql:3306/demo",
+      "connection.user"            : "mysqluser",
+      "connection.password"        : "mysqlpw",
+      "topics"                     : "day10-transactions",
+      "tasks.max"                  : "4",
+      "auto.create"                : "true",
+      "auto.evolve"                : "true",
+      "transforms"                 : "renameTS",
+      "transforms.renameTS.type"   : "org.apache.kafka.connect.transforms.ReplaceField$Value",
+      "transforms.renameTS.renames": "txn_date:transaction_timestamp"
+      }'
+```
+
+####  Twelve Days of SMT 🎄 - Day 1: InsertField (timestamp)
 ```bash
 # inicia os containers
 dockercompose up -d
 
-# cria um conector para gerar dados automáticos no mysql
+# cria um conector para gerar dados automáticos no tópico customers e transacations
 curl -i -X PUT -H  "Content-Type:application/json" \
     http://localhost:8083/connectors/source-voluble-datagen-00/config \
     -d '{
