@@ -5,7 +5,7 @@
         <img alt="Made by" src="https://img.shields.io/badge/made%20by-adriano%20avelino-gree">
     </a>
     <img alt="Repository size" src="https://img.shields.io/github/repo-size/my-study-area/estudo-kafka-connect">
-    <a href="https://github.com/EliasGcf/readme-template/commits/master">
+    <a href="https://github.com/my-study-area/estudo-kafka-connect/commits/master">
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/my-study-area/estudo-kafka-connect">
     </a>
 </p>
