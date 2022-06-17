@@ -93,6 +93,8 @@ curl -i -X PUT -H "Accept:application/json" \
       }'
 ```
 
+> Para instalar os conectores manualmente basta realizar o download do conector e criar um Dockerfile copiando a pasta `lib` e o arquivo `manifest.json` no diretório `/usr/share/confluent-hub-components/<NOME-CONECTOR>` dentro do container
+
 ####  Twelve Days of SMT 🎄 - Day 1: InsertField (timestamp)
 ```bash
 # inicia os containers
