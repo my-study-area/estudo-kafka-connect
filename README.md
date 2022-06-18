@@ -496,3 +496,6 @@ curl -v http://localhost:8083/connector-plugins
 - [Monitoring Kafka Connect and Connectors](https://docs.confluent.io/platform/current/connect/monitoring.html)
 - [Amazon S3 Sink Connector Configuration Properties](https://docs.confluent.io/kafka-connect-s3-sink/current/configuration_options.html#storage)
 - [List all Files in an S3 Bucket with AWS CLI](https://bobbyhadz.com/blog/aws-cli-list-all-files-in-bucket)
+- [Connector Developer Guide](https://docs.confluent.io/platform/current/connect/devguide.html)
+- [How to Write a Connector for Kafka Connect – Deep Dive into Configuration Handling](https://www.confluent.io/blog/write-a-kafka-connect-connector-with-configuration-handling/?_ga=2.91818522.1207622556.1655507562-1631858859.1655396982)
+- [4 Steps to Creating Apache Kafka Connectors with the Kafka Connect API](https://www.confluent.io/blog/create-dynamic-kafka-connect-source-connectors/?_ga=2.91818522.1207622556.1655507562-1631858859.1655396982)
