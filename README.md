@@ -499,3 +499,7 @@ curl -v http://localhost:8083/connector-plugins
 - [Connector Developer Guide](https://docs.confluent.io/platform/current/connect/devguide.html)
 - [How to Write a Connector for Kafka Connect – Deep Dive into Configuration Handling](https://www.confluent.io/blog/write-a-kafka-connect-connector-with-configuration-handling/?_ga=2.91818522.1207622556.1655507562-1631858859.1655396982)
 - [4 Steps to Creating Apache Kafka Connectors with the Kafka Connect API](https://www.confluent.io/blog/create-dynamic-kafka-connect-source-connectors/?_ga=2.91818522.1207622556.1655507562-1631858859.1655396982)
+- [Create a test data generator using Kafka Connect](https://zendesk.engineering/create-a-test-data-generator-using-kafka-connect-f0a2419af76a)
+  - [Kafka Connect Datagen Connector](https://github.com/xushiyan/kafka-connect-datagen)
+- [Kafka Connect Sample Connector](https://github.com/riferrei/kafka-source-connector)
+  - [Building your First Connector for Kafka Connect](https://www.youtube.com/watch?v=EXviLqXFoQI)
