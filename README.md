@@ -475,6 +475,116 @@ fonte: [Kafka Connect: Integração entre sistemas (MySQL /Elasticsearch)](https
 
 curl -v http://localhost:8083/connector-plugins
 
+## Instalação manual de Kafka e conector
+### Kafka
+```bash
+# realiza o download
+wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.13-2.8.1.tgz
+
+# descompacta o arquivo
+tar -xzf kafka_2.13-2.8.1.tgz
+
+# deleta arquivo tgz
+rm kafka_2.13-2.8.1.tgz
+
+# entra no repositório
+cd kafka_2.13-2.8.1
+
+# adiciona o listener para o kafka
+echo 'advertised.listeners=PLAINTEXT://localhost:9092' >> config/server.properties
+
+# inicia o Zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# inicia o Kafka
+bin/kafka-server-start.sh config/server.properties
+
+# comando nc verificando a comunicação com a porta 9092
+nc -vz localhost 9092
+
+# cria uma tópico
+bin/kafka-topics.sh --create --topic teste1 --bootstrap-server \
+localhost:9092 --partitions 3 --replication-factor 2
+
+# cria um producer
+bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic teste1
+
+# cria um consumer
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic teste1 --from-beginning
+```
+
+### Conector Kafka
+Para instalarmos um conector é necessário que o Kafka já esteja inicializado.
+
+Na instalação manual é necessário ter o arquivo jar e todas as suas dependências. Uma forma de conseguir é os plugins é no [Confluent Hub](https://www.confluent.io/hub/) ou na comunidade, através do Github. No exemplo abaixo temos o exemplo do conector faker-events-connector e sua estrutura. 
+```bash
+/opt/connectors
+└── faker-events-connector
+    ├── doc
+    │   ├── LICENSE
+    │   └── README.md
+    ├── lib
+    │   ├── automaton-1.11-8.jar
+    │   ├── commons-lang3-3.5.jar
+    │   ├── faker-events-connector-0.1.0.jar
+    │   ├── generex-1.0.2.jar
+    │   ├── gson-2.9.0.jar
+    │   ├── javafaker-1.0.2.jar
+    │   ├── logback-classic-1.2.10.jar
+    │   ├── logback-core-1.2.10.jar
+    │   ├── slf4j-api-1.7.32.jar
+    │   └── snakeyaml-1.23-android.jar
+    └── manifest.json
+
+3 directories, 13 files
+```
+No exemplo acima o plugin está na pasta `/opt/connectors`, mas poderia estar em qualquer outra pasta. Para definir o diretório dos plugin devemos utilizar adicionar a linha `plugin.path=/opt/connectors` no arquivo `connect-distributed.properties`. Para isso podemos executar o seguinte comando: `echo "plugin.path=/opt/connectors" >> connect-distributed.properties`.
+
+Agora é a vez de criarmos o arquivo de configuração do plugin (`./exemplos/basic-example.json`):
+```json
+{
+    "name": "basic-example",
+    "config": {
+        "connector.class": "br.com.fec.FecConnector",
+        "topic.name": "topico2",
+        "message.value": "#{Name.full_name}",
+        "tasks.max": "1",
+        "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "key.converter.schemas.enable": false,
+        "value.converter.schemas.enable":false
+    }
+}
+```
+
+Com o Kafka inicializado, arquivo de configuração do Kafka connect atualizado e configuração do plugin podemos executar os seguintes comandos:
+```bash
+# inicia o conector
+bin/connect-distributed.sh config/connect-distributed.properties
+
+# cria plugin faker-events-connector
+curl -X POST -H "Content-Type:application/json" -d @exemplos/basic-example.json http://localhost:8083/connectors
+
+# lista os conectores
+curl -v http://localhost:8083/connectors
+
+# lista os plugins instalados
+curl -v http://localhost:8083/connector-plugins
+
+# consome os eventos criados pelo plugin
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+--topic topico2 --from-beginning \
+--property print.key=true
+
+# deleta o plugin faker-events-connector
+curl -X DELETE http://localhost:8083/connectors/basic-example
+```
+
+Fontes: 
+- [How to install connector plugins in Kafka Connect](https://rmoff.net/2020/06/19/how-to-install-connector-plugins-in-kafka-connect/)
+- [Apache Kafka Quickstart - Step 6: Import/Export Your Data As Streams Of Events With Kafka Connect](https://kafka.apache.org/quickstart)
+
+
 ## Links
 - [Conceitos de kafka Connect](https://docs.confluent.io/platform/current/connect/concepts.html)
 - [Iniciando com Kafka Connect](https://docs.confluent.io/home/connect/self-managed/userguide.html)
@@ -503,3 +613,4 @@ curl -v http://localhost:8083/connector-plugins
   - [Kafka Connect Datagen Connector](https://github.com/xushiyan/kafka-connect-datagen)
 - [Kafka Connect Sample Connector](https://github.com/riferrei/kafka-source-connector)
   - [Building your First Connector for Kafka Connect](https://www.youtube.com/watch?v=EXviLqXFoQI)
+  - [Novo repositório com exemplo de Kafka connector para desenvolvimento local e na AWS com terraform](https://github.com/build-on-aws/building-apache-kafka-connectors)

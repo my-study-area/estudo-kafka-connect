@@ -1,0 +1,13 @@
+{
+    "name": "basic-example2",
+    "config": {
+        "connector.class": "br.com.fec.FecConnector",
+        "topic.name": "topico2",
+        "message.value": "#{Name.full_name}",
+        "tasks.max": "1",
+        "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "key.converter.schemas.enable": false,
+        "value.converter.schemas.enable":false
+    }
+}
